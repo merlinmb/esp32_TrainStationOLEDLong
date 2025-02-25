@@ -52,7 +52,7 @@ byte _networkConnection = 1;
 
 #define OTA_UPDATE_WEBPATH "/firmware"
 #define OTA_UPDATE_USERNAME "admin"
-#define OTA_UPDATE_PASSWORD "1llusion_mb"
+#define OTA_UPDATE_PASSWORD "admin"
 #define HTTPRESPONSETIMEOUT 450
 
 const char *_deviceClientName = "espTestDevice";
