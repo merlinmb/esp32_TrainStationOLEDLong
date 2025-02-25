@@ -1,0 +1,254 @@
+<soapEnvelope xmlnssoap="http//www.w3.org/2003/05/soap-envelope" xmlnsxsi="http//www.w3.org/2001/XMLSchema-instance" xmlnsxsd="http//www.w3.org/2001/XMLSchema">
+	<soapBody>
+		<GetDepBoardWithDetailsResponse
+			xmlns="http//thalesgroup.com/RTTI/2016-02-16/ldb/">
+			<GetStationBoardResult xmlnslt="http//thalesgroup.com/RTTI/2012-01-13/ldb/types" xmlnslt8="http//thalesgroup.com/RTTI/2021-11-01/ldb/types" xmlnslt6="http//thalesgroup.com/RTTI/2017-02-02/ldb/types" xmlnslt7="http//thalesgroup.com/RTTI/2017-10-01/ldb/types" xmlnslt4="http//thalesgroup.com/RTTI/2015-11-27/ldb/types" xmlnslt5="http//thalesgroup.com/RTTI/2016-02-16/ldb/types" xmlnslt2="http//thalesgroup.com/RTTI/2014-02-20/ldb/types" xmlnslt3="http//thalesgroup.com/RTTI/2015-05-14/ldb/types">
+				<lt4generatedAt>2022-09-09T150729.1162775+0100</lt4generatedAt>
+				<lt4locationName>Newbury</lt4locationName>
+				<lt4crs>NBY</lt4crs>
+				<lt4platformAvailable>true</lt4platformAvailable>
+				<lt5trainServices>
+					<lt5service>
+						<lt4std>1507</lt4std>
+						<lt4etd>On time</lt4etd>
+						<lt4platform>3</lt4platform>
+						<lt4operator>Great Western Railway</lt4operator>
+						<lt4operatorCode>GW</lt4operatorCode>
+						<lt4serviceType>train</lt4serviceType>
+						<lt4serviceID>rtk5PSaIYiQ4cBawAYCToA==</lt4serviceID>
+						<lt5origin>
+							<lt4location>
+								<lt4locationName>Newbury</lt4locationName>
+								<lt4crs>NBY</lt4crs>
+							</lt4location>
+						</lt5origin>
+						<lt5destination>
+							<lt4location>
+								<lt4locationName>Reading</lt4locationName>
+								<lt4crs>RDG</lt4crs>
+							</lt4location>
+						</lt5destination>
+						<lt5subsequentCallingPoints>
+							<lt4callingPointList>
+								<lt4callingPoint>
+									<lt4locationName>Newbury Racecourse</lt4locationName>
+									<lt4crs>NRC</lt4crs>
+									<lt4st>1509</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Thatcham</lt4locationName>
+									<lt4crs>THA</lt4crs>
+									<lt4st>1513</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Midgham</lt4locationName>
+									<lt4crs>MDG</lt4crs>
+									<lt4st>1518</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Aldermaston</lt4locationName>
+									<lt4crs>AMT</lt4crs>
+									<lt4st>1521</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Theale</lt4locationName>
+									<lt4crs>THE</lt4crs>
+									<lt4st>1526</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Reading West</lt4locationName>
+									<lt4crs>RDW</lt4crs>
+									<lt4st>1533</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Reading</lt4locationName>
+									<lt4crs>RDG</lt4crs>
+									<lt4st>1536</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+							</lt4callingPointList>
+						</lt5subsequentCallingPoints>
+					</lt5service>
+					<lt5service>
+						<lt4std>1517</lt4std>
+						<lt4etd>On time</lt4etd>
+						<lt4platform>1</lt4platform>
+						<lt4operator>Great Western Railway</lt4operator>
+						<lt4operatorCode>GW</lt4operatorCode>
+						<lt4serviceType>train</lt4serviceType>
+						<lt4serviceID>shVVbgMmZau7YQcsArWa9A==</lt4serviceID>
+						<lt5origin>
+							<lt4location>
+								<lt4locationName>London Paddington</lt4locationName>
+								<lt4crs>PAD</lt4crs>
+							</lt4location>
+						</lt5origin>
+						<lt5destination>
+							<lt4location>
+								<lt4locationName>Paignton</lt4locationName>
+								<lt4crs>PGN</lt4crs>
+							</lt4location>
+						</lt5destination>
+						<lt5subsequentCallingPoints>
+							<lt4callingPointList>
+								<lt4callingPoint>
+									<lt4locationName>Pewsey</lt4locationName>
+									<lt4crs>PEW</lt4crs>
+									<lt4st>1535</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Westbury</lt4locationName>
+									<lt4crs>WSB</lt4crs>
+									<lt4st>1553</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Castle Cary</lt4locationName>
+									<lt4crs>CLC</lt4crs>
+									<lt4st>1613</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Taunton</lt4locationName>
+									<lt4crs>TAU</lt4crs>
+									<lt4st>1634</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Exeter St Davids</lt4locationName>
+									<lt4crs>EXD</lt4crs>
+									<lt4st>1659</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Dawlish</lt4locationName>
+									<lt4crs>DWL</lt4crs>
+									<lt4st>1712</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Teignmouth</lt4locationName>
+									<lt4crs>TGM</lt4crs>
+									<lt4st>1717</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Newton Abbot</lt4locationName>
+									<lt4crs>NTA</lt4crs>
+									<lt4st>1725</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Torre</lt4locationName>
+									<lt4crs>TRR</lt4crs>
+									<lt4st>1734</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Torquay</lt4locationName>
+									<lt4crs>TQY</lt4crs>
+									<lt4st>1738</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Paignton</lt4locationName>
+									<lt4crs>PGN</lt4crs>
+									<lt4st>1744</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+							</lt4callingPointList>
+						</lt5subsequentCallingPoints>
+					</lt5service>
+					<lt5service>
+						<lt4std>1522</lt4std>
+						<lt4etd>On time</lt4etd>
+						<lt4platform>2</lt4platform>
+						<lt4operator>Great Western Railway</lt4operator>
+						<lt4operatorCode>GW</lt4operatorCode>
+						<lt4serviceType>train</lt4serviceType>
+						<lt4serviceID>pr7zVXX/cxxX4nYtK1tnbw==</lt4serviceID>
+						<lt5rsid>GW000900</lt5rsid>
+						<lt5origin>
+							<lt4location>
+								<lt4locationName>Newbury</lt4locationName>
+								<lt4crs>NBY</lt4crs>
+							</lt4location>
+						</lt5origin>
+						<lt5destination>
+							<lt4location>
+								<lt4locationName>Bedwyn</lt4locationName>
+								<lt4crs>BDW</lt4crs>
+							</lt4location>
+						</lt5destination>
+						<lt5subsequentCallingPoints>
+							<lt4callingPointList>
+								<lt4callingPoint>
+									<lt4locationName>Kintbury</lt4locationName>
+									<lt4crs>KIT</lt4crs>
+									<lt4st>1529</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Hungerford</lt4locationName>
+									<lt4crs>HGD</lt4crs>
+									<lt4st>1534</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>Bedwyn</lt4locationName>
+									<lt4crs>BDW</lt4crs>
+									<lt4st>1542</lt4st>
+									<lt4et>On time</lt4et>
+								</lt4callingPoint>
+							</lt4callingPointList>
+						</lt5subsequentCallingPoints>
+					</lt5service>
+					<lt5service>
+						<lt4std>1532</lt4std>
+						<lt4etd>1541</lt4etd>
+						<lt4platform>2</lt4platform>
+						<lt4operator>Great Western Railway</lt4operator>
+						<lt4operatorCode>GW</lt4operatorCode>
+						<lt4serviceType>train</lt4serviceType>
+						<lt4serviceID>6oUUQy7PbRK7O1BKidmnRw==</lt4serviceID>
+						<lt5origin>
+							<lt4location>
+								<lt4locationName>Exeter St Davids</lt4locationName>
+								<lt4crs>EXD</lt4crs>
+							</lt4location>
+						</lt5origin>
+						<lt5destination>
+							<lt4location>
+								<lt4locationName>London Paddington</lt4locationName>
+								<lt4crs>PAD</lt4crs>
+							</lt4location>
+						</lt5destination>
+						<lt5subsequentCallingPoints>
+							<lt4callingPointList>
+								<lt4callingPoint>
+									<lt4locationName>Reading</lt4locationName>
+									<lt4crs>RDG</lt4crs>
+									<lt4st>1547</lt4st>
+									<lt4et>1555</lt4et>
+								</lt4callingPoint>
+								<lt4callingPoint>
+									<lt4locationName>London Paddington</lt4locationName>
+									<lt4crs>PAD</lt4crs>
+									<lt4st>1614</lt4st>
+									<lt4et>1618</lt4et>
+								</lt4callingPoint>
+							</lt4callingPointList>
+						</lt5subsequentCallingPoints>
+					</lt5service>
+				</lt5trainServices>
+			</GetStationBoardResult>
+		</GetDepBoardWithDetailsResponse>
+	</soapBody>
+</soapEnvelope>
