@@ -23,7 +23,7 @@
 #include <TimeLib.h>
 #include <Time.h>
 
-//#define DEBUG 1
+#define DEBUG 1
 #ifdef DEBUG
 #define DEBUG_PRINT(x) Serial.print(x)
 #define DEBUG_PRINTDEC(x, DEC) Serial.print(x, DEC)
@@ -36,13 +36,6 @@
 #define DEBUG_PRINTLNDEC(x, DEC)
 #endif
 
-#define MQTT_MAX_PACKET_SIZE 512
-
-#define WIFI_ACCESSPOINT "merlinhome"
-#define WIFI_ACCESSPOINT_PASSWORD "zzzzzz"
-
-#define WIFI_ACCESSPOINT1 "xxxxxx"
-#define WIFI_ACCESSPOINT_PASSWORD1 "yyyyy"
 
 byte _networkConnection = 1;
 
@@ -448,6 +441,7 @@ void flipAPDetails()
 int isWiFiConnected(String deviceName, String apName, String apPassword)
 {
 	DEBUG_PRINTLN("Checking that the WiFi is connected");
+	DEBUG_PRINTLN("\r\nConnecting to: " + String(apName));
 
 	if (WiFi.status() == WL_CONNECTED)
 	{
@@ -456,7 +450,6 @@ int isWiFiConnected(String deviceName, String apName, String apPassword)
 		return true;
 	}
 
-	DEBUG_PRINTLN("\r\nConnecting to: " + String(apName));
 	WiFi.begin(apName.c_str(), apPassword.c_str());
 
 	byte counter = 0;
@@ -638,7 +631,7 @@ void adjustBST(struct tm *timeinfo)
 {
 	if (isBST(timeinfo))
 	{
-		DEBUG_PRINTLN("adjustBST()");
+		//DEBUG_PRINTLN("adjustBST()");
 		timeinfo->tm_hour += 1;
 		if (timeinfo->tm_hour == 24)
 			timeinfo->tm_hour = 0;

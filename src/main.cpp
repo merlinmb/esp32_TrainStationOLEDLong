@@ -3,29 +3,27 @@
 #include <SPIFFS.h>
 
 #include "AXS15231B.h"
-#include <Arduino.h>
+//#include <Arduino.h>
 #include <TFT_eSPI.h>
-
+#include "pins_config.h"
 #include <Wire.h>
-
 #include "time.h"
-#include "connectionDetails.h"
-
 #include <TimeLib.h>
 
-// #include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
-
+#include "connectionDetails.h"
 #include "merlinNetwork.h"
 #include "merlinUpdateWebServer.h"
-
 #include "merlinTrainData.h"
-#include "Orbitron_Medium_20.h"
-#include "NotoSansBold15.h"
-#include "Monospaced_plain_12.h"
-#include "Monospaced_plain_16.h"
-#include "Orbitron_Bold_16.h"
+
+#include "fonts/Orbitron_Medium_20.h"
+#include "fonts/NotoSansBold15.h"
+#include "fonts/Monospaced_plain_12.h"
+#include "fonts/Monospaced_plain_16.h"
+#include "fonts/Orbitron_Bold_16.h"
 
 #define BATTERY_PIN 2
+#define LCD_BACKLIGHT 38
+
 /*
  * Touch Specific Calls & definition
  */
@@ -210,18 +208,23 @@ void setBrightness(byte brightnessValue)
   DEBUG_PRINTLN("setBrightness: " + String(brightnessValue));
 
   // ledcWrite(0, brightnessValue);
-  hw_set_brightness(brightnessValue);
+  if (brightnessValue>0) 
+    brightnessValue=255;
+  if (brightnessValue<0) 
+    brightnessValue=0;
 
-  // digitalWrite(TFT_BL, HIGH);
+  //hw_set_brightness(brightnessValue);
+  //analogWrite(LCD_BACKLIGHT, brightnessValue);  
+  digitalWrite(TFT_BL, brightnessValue==255?1:0); // turn on backlight if brightness is > 0
 
-  for (int i = 0; i < 5; i++)
-  {
-    if (brightnessValue == _brightnesses[i])
-    {
-      _selectedBrightness = i;
-      break;
-    }
-  }
+  // for (int i = 0; i < 5; i++)
+  // {
+  //   if (brightnessValue == _brightnesses[i])
+  //   {
+  //     _selectedBrightness = i;
+  //     break;
+  //   }
+  // }
 }
 
 void toggleBrightness(bool isBright)
@@ -1150,10 +1153,10 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
   {
     mqttTransmitInitStat();
   }
-  if (__incomingTopic == "cmnd/mcmddevices/brightness")
+  if (__incomingTopic == "cmnd/"+ String(MQTT_FRIENDLYNAME) +"/brightness")
   {
     _brightness = __payloadString.toInt();
-    _brightness = map(_brightness, 0, 100, 0, 255);
+    //_brightness = map(_brightness, 0, 100, 0, 255);
     DEBUG_PRINTLN("Setting Brightness to: " + String(_brightness));
     setBrightness(_brightness);
   }
@@ -1537,7 +1540,7 @@ void printRAM()
 void setupWifi()
 {
 
-  DisplayOut("Initialising WiFi: 1st AP");
+  DisplayOut("Initialising WiFi: 1st AP ");
 
   if (!isWiFiConnected(_mqttClientId))
   {
@@ -1615,7 +1618,6 @@ void setup()
   DisplayOut("----------------------------------");
 
   setupWifi();
-  // setupWifiManager();
 
   // DEBUG_PRINT(F("********** Free Heap: "));   DEBUG_PRINTLN(ESP.getFreeHeap());
   DisplayOut("Web Server config");
