@@ -6,8 +6,6 @@
 #include <merlinNetwork.h>
 #include <WiFiClientSecure.h>
 
-//WiFiClientSecure _espWiFiClient;
-
 using namespace tinyxml2;
 #define DEBUG 1
 

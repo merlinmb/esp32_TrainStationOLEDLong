@@ -1679,16 +1679,9 @@ void setup()
 
 void loop()
 {
-  //_sprite.fillSprite(TFT_CYAN);
-  // lcd_PushColors_rotated_90(0, 0, 640, 180, (uint16_t*)_sprite.getPointer());
-  // delay(500);
-  //_sprite.fillSprite(TFT_ORANGE);
-  // lcd_PushColors_rotated_90(0, 0, 640, 180, (uint16_t*)_sprite.getPointer());
-  // delay(500);
 
   if ((_initComplete && !_updatingFirmware))
   {
-
     _runCurrent = millis(); // sets the counter
 
     if (_runCurrent - _runTouch >= UPDATE_TOUCH_INTERVAL_MILLISECS)
@@ -1707,17 +1700,7 @@ void loop()
       isWiFiConnected(); // make sure we're still connected
       _runWiFiConnectionCheck = millis();
     }
-    /*
-        if ((_runCurrent - _runEmptyFrame >= UPDATE_EMPTY_INTERVAL_MILLISECS))
-        {
 
-
-          if (_currentFrame != 0)
-            _currentFrame = 1;
-
-          _runEmptyFrame = millis();
-        }
-    */
     if ((_runCurrent - _runFrame >= UPDATE_UI_FRAME_INTERVAL_MILLISECS) || _forceUpdate || _forceRender)
     {
 
