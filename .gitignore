@@ -6,3 +6,4 @@
 .vscode/ipch
 src/main.cpp.hw
 src/main.cpp.working
+include/connectionDetails.h

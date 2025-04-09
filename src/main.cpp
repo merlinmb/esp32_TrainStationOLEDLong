@@ -1156,10 +1156,18 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
   if (__incomingTopic == "cmnd/"+ String(MQTT_FRIENDLYNAME) +"/brightness")
   {
     _brightness = __payloadString.toInt();
-    //_brightness = map(_brightness, 0, 100, 0, 255);
     DEBUG_PRINTLN("Setting Brightness to: " + String(_brightness));
     setBrightness(_brightness);
   }
+
+  if (__incomingTopic == "cmnd/mcmddevices/brightnesspercentage")
+  {
+    _brightness = __payloadString.toInt();
+    _brightness = map(_brightness, 0, 100, 0, 255);
+    DEBUG_PRINTLN("Setting Brightness to: " + String(_brightness));
+    setBrightness(_brightness);
+  }
+
 }
 void mqttCustomSubscribe() {}
 void mqttTransmitCustomStat() {}
@@ -1790,11 +1798,9 @@ void loop()
     lcd_PushColors_rotated_90(0, 0, 640, 180, (uint16_t *)_sprite.getPointer());
   }
 
-  if (WiFi.status() == WL_CONNECTED)
-  {
     _mqttClient.loop();
     _httpServer.handleClient(); //// Check if a client has connected
 
     // ArduinoOTA.handle();        /* this function will handle incomming chunk of SW, flash and respond sender */
-  }
+  
 }
