@@ -339,6 +339,8 @@ bool parseTrainData(const char* input)
 		_mainStation.departures[__departuresID].departures_all_item_aimed_departure_time = getServiceDetail(__elementlt5service, "lt4std");
 		_mainStation.departures[__departuresID].departures_all_item_status =  getServiceDetail(__elementlt5service, "lt4etd"); // "LATE", "STARTS HERE", "ON ...
 		_mainStation.departures[__departuresID].departures_all_item_service_timetable_id = getServiceDetail(__elementlt5service,"lt4serviceID");
+
+
 		//_mainStation.departures[__departuresID].departures_all_item_service_timetable_id = getServiceDetail(__elementlt5service,"lt4serviceID");
 
 		XMLElement * __elementlt5origin = __elementlt5service->FirstChildElement("lt5origin");
@@ -357,8 +359,9 @@ bool parseTrainData(const char* input)
 			}
 		}
 		
-		//_mainStation.departures[__departuresID].departures_all_item_expected_arrival_time = departures_all_item["expected_arrival_time"].as<String>();
-		//_mainStation.departures[__departuresID].departures_all_item_expected_departure_time = departures_all_item["expected_departure_time"].as<String>();
+		//_mainStation.departures[__departuresID].departures_all_item_expected_arrival_time = getServiceDetail(__elementlt5service, "expected_arrival_time");
+		//_mainStation.departures[__departuresID].departures_all_item_expected_departure_time = getServiceDetail(__elementlt5service, "expected_departure_time");
+
 		//_mainStation.departures[__departuresID].departures_all_item_best_arrival_estimate_mins = departures_all_item["best_arrival_estimate_mins"];
 		//_mainStation.departures[__departuresID].departures_all_item_best_departure_estimate_mins = departures_all_item["best_departure_estimate_mins"];
 		//DEBUG_PRINTLN("Aimed Departure Time: " + _mainStation.departures[__departuresID].departures_all_item_aimed_departure_time);
@@ -390,4 +393,34 @@ bool GetTrainConditionsAndForecast(String time, String date)
 
 	DEBUG_PRINTLN("------------------------------------------------");
 	return __ret;
+}
+
+String getETAFromTrainlineStruct(int __train)
+{
+  return _mainStation.departures[__train].timeTable.trainStops[_mainStation.departures[__train].timeTableLength - 1].stop_aimed_arrival_time;
+}
+
+String getCallingAtFromTrainLineStruct(int __train)
+{
+  String __stopString = "";
+  if (_mainStation.departures[__train].timeTableLength > 0)
+  {
+    __stopString = "";
+  }
+  else
+  {
+    return "";
+  }
+
+  for (byte i = 0; i < _mainStation.departures[__train].timeTableLength; i++)
+  {
+    __stopString += _mainStation.departures[__train].timeTable.trainStops[i].stop_station_name;
+    if (i < _mainStation.departures[__train].timeTableLength - 1)
+      __stopString = __stopString + ", ";
+  }
+  /*
+  if (__stopString.length() > 38) //38 characters fit in this screen
+    __stopString = __stopString.substring(0, 38) + "...";
+  */
+  return __stopString;
 }

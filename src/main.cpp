@@ -21,6 +21,8 @@
 #include "fonts/Monospaced_plain_16.h"
 #include "fonts/Orbitron_Bold_16.h"
 
+#include "ArduinoJson.h"
+
 #define BATTERY_PIN 2
 #define LCD_BACKLIGHT 38
 
@@ -655,35 +657,7 @@ u_int16_t getLiveTrainStatusColorFromInput(int __train)
   return TFT_WHITE;
 }
 
-String getETAFromTrainlineStruct(int __train)
-{
-  return _mainStation.departures[__train].timeTable.trainStops[_mainStation.departures[__train].timeTableLength - 1].stop_aimed_arrival_time;
-}
 
-String getCallingAtFromTrainLineStruct(int __train)
-{
-  String __stopString = "";
-  if (_mainStation.departures[__train].timeTableLength > 0)
-  {
-    __stopString = "";
-  }
-  else
-  {
-    return "";
-  }
-
-  for (byte i = 0; i < _mainStation.departures[__train].timeTableLength; i++)
-  {
-    __stopString += _mainStation.departures[__train].timeTable.trainStops[i].stop_station_name;
-    if (i < _mainStation.departures[__train].timeTableLength - 1)
-      __stopString = __stopString + ", ";
-  }
-  /*
-  if (__stopString.length() > 38) //38 characters fit in this screen
-    __stopString = __stopString.substring(0, 38) + "...";
-  */
-  return __stopString;
-}
 
 /***************************************************
   Display & Rendering
@@ -950,62 +924,12 @@ void RenderPlatform(int _line)
 
     _callingAtSprites[_line].unloadFont();
 
-    /*
-      int __currentClock = (String(timeHour) + String(timeMin)).toInt();
-      DEBUG_PRINTLN("Current at clock: "+String(__currentClock));
-      int __totalstops = _mainStation.departures[_line].timeTableLength-1;
-      bool __midpointFound = false;
-      for (byte i = 0; i < __totalstops; i++)
-      {
 
-        String __stopAimedDepartureTime =_mainStation.departures[_line].timeTable.trainStops[i].stop_aimed_departure_time;
-        String __stationCode =_mainStation.departures[_line].timeTable.trainStops[i].stop_station_code;
-
-        __stopAimedDepartureTime.replace(":","");
-        //DEBUG_PRINTLN(__stationCode+" departure time: "+String(__stopAimedDepartureTime));
-        int __stopClock = __stopAimedDepartureTime.toInt();
-        DEBUG_PRINTLN(__stationCode+" aimed departure time: "+String(__stopClock));
-
-        int __centerX = LINERENDERVIEWPORTWIDTH/2;
-        int __centerY = LINERENDERVIEWPORTHEIGHT/2;
-
-        _lineRenderSprites[_line].deleteSprite();
-        _lineRenderSprites[_line].createSprite(LINERENDERVIEWPORTWIDTH, LINERENDERVIEWPORTHEIGHT-2);
-        clearLineRenderSprite(_line);
-
-
-
-        if (__currentClock < __stopClock)
-        {
-
-          if (i==0) //start of line
-          {
-
-          }
-          if (i==__totalstops) //end of line
-          {
-
-          }
-          if ((i-1)>0) //not first stop
-          {
-
-          }
-          if ((i+1)<__totalstops)
-          {
-
-          }
-
-          __midpointFound = true;
-        }
-
-        //render the train arror in the middle of the viewport
-        _lineRenderSprites[_line].fillTriangle(__centerX-5,__centerY-5, __centerX,__centerY,  __centerX+5,__centerY-5, getLiveTrainStatusColorFromInput(_line));
-
-        if (__midpointFound)       {break;}
-
-      }
-    */
   }
+
+
+
+  DEBUG_PRINTLN("RenderPlatform: completed...");
 }
 
 void renderEmpty()
@@ -1199,6 +1123,7 @@ void initDisplay()
 
   DEBUG_PRINTLN("axs15231_init()");
   axs15231_init(); //_display.init();
+  lcd_setRotation(2);
   delay(100);
 
   _sprite.createSprite(DISPLAY_WIDTH, DISPLAY_HEIGHT);
@@ -1452,6 +1377,36 @@ void reverseFrame()
   }
 }
 
+String createJSONObjectFromTrainData()
+{
+  StaticJsonDocument<4096> doc; // Increased capacity to accommodate all fields
+  JsonArray departures = doc.to<JsonArray>();
+
+  for (int i = 0; i < _numTrains; i++) {
+    JsonObject departure = departures.createNestedObject();
+    //departure["mode"] = _mainStation.departures[i].departures_all_item_mode;
+    //departure["service"] = _mainStation.departures[i].departures_all_item_service;
+    //departure["train_uid"] = _mainStation.departures[i].departures_all_item_train_uid;
+    departure["platform"] = _mainStation.departures[i].departures_all_item_platform;
+    //departure["operator"] = _mainStation.departures[i].departures_all_item_operator;
+    //departure["operator_name"] = _mainStation.departures[i].departures_all_item_operator_name;
+    departure["aimed_departure_time"] = _mainStation.departures[i].departures_all_item_aimed_departure_time;
+    departure["origin_name"] = _mainStation.departures[i].departures_all_item_origin_name;
+    departure["destination_name"] = _mainStation.departures[i].departures_all_item_destination_name;
+    //departure["source"] = _mainStation.departures[i].departures_all_item_source;
+    //departure["category"] = _mainStation.departures[i].departures_all_item_category;
+    //departure["service_timetable_id"] = _mainStation.departures[i].departures_all_item_service_timetable_id;
+    departure["status"] = _mainStation.departures[i].departures_all_item_status;
+    departure["expected_arrival_time"] = getETAFromTrainlineStruct(i);
+    //departure["expected_departure_time"] = _mainStation.departures[i].departures_all_item_expected_departure_time;
+    //departure["best_arrival_estimate_mins"] = _mainStation.departures[i].departures_all_item_best_departure_estimate_mins;
+  }
+// Serialize the JSON to a String
+  String output;
+  serializeJson(doc, output);
+  return output;
+}
+
 void updateTrainDataRenderSprites()
 {
 
@@ -1463,12 +1418,19 @@ void updateTrainDataRenderSprites()
   updateLocalTime();
   updateTrainStationData();
 
+  String __jsonForMQTT = createJSONObjectFromTrainData(); 
+  mqttPublishStat("traindata", __jsonForMQTT);
+
+
+
   _runTrains = millis();
   for (byte i = 0; i < _numTrains; i++)
   {
     DisplayOut("Rendering arrival #" + String(i));
     RenderPlatform(i);
   }
+
+
   DisplayOut("Rendering all departures screen");
   RenderAllStationStrings();
 }

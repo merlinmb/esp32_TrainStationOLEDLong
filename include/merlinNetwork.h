@@ -18,6 +18,7 @@
 //#include <ArduinoOTA.h>
 
 #include <PubSubClient.h>
+#define MQTT_MAX_PACKET_SIZE 2048
 
 #include <NTPClient.h>
 #include <TimeLib.h>
@@ -294,33 +295,33 @@ void mqttPublishStat(String deviceName, String topicPostFix, String value, bool 
 	DEBUG_PRINTLN(_lastPublishedMQTTMessage);
 }
 
-void mqttPublishStat(String name, String value, bool retain)
+void mqttPublishStat(String topicPostFix, String value, bool retain)
 {
-	mqttPublishStat(_deviceClientName, name, value, retain);
+	mqttPublishStat(_deviceClientName, topicPostFix, value, retain);
 }
 
-void mqttPublishStat(String deviceName, String name, String value)
+void mqttPublishStat(String deviceName, String topicPostFix, String value)
 {
-	mqttPublishStat(deviceName, name, value, false);
+	mqttPublishStat(deviceName, topicPostFix, value, false);
 }
-void mqttPublishStat(String name, String value)
+void mqttPublishStat(String topicPostFix, String value)
 {
-	mqttPublishStat(_deviceClientName, name, value);
+	mqttPublishStat(_deviceClientName, topicPostFix, value);
 }
 
-void mqttHomePublish(String name, String value, bool retain)
+void mqttHomePublish(String topicPostFix, String value, bool retain)
 {
 	//DEBUG_PRINTLN("MQTT Sending ");
-	String __ret = ("stat/home/" + name);
+	String __ret = ("stat/home/" + topicPostFix);
 	DEBUG_PRINTLN(__ret + " " + value);
 	_mqttClient.publish(__ret.c_str(), value.c_str(), retain);
 	_lastPublishedMQTTMessage = __ret + " " + value;
 	//DEBUG_PRINTLN("MQTT: Sent");
 }
 
-void mqttHomePublish(String name, String value)
+void mqttHomePublish(String topicPostFix, String value)
 {
-	mqttHomePublish(name, value, false);
+	mqttHomePublish(topicPostFix, value, false);
 }
 
 void mqttTransmitInitStat(String deviceName)
