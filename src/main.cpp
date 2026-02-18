@@ -10,7 +10,8 @@
 #include "time.h"
 #include <TimeLib.h>
 
-#include "connectionDetails.h"
+#include "connectionDetails.h" //must be included before merlinNetwork.h & traindata calls as it contains some #defines used in that file
+
 #include "merlinNetwork.h"
 #include "merlinUpdateWebServer.h"
 #include "merlinTrainData.h"

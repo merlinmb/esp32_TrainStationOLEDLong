@@ -40,13 +40,9 @@
 
 byte _networkConnection = 1;
 
-#define MQTT_SERVER_IP "192.168.1.55"
-#define MQTT_SERVER_PORT 1883
-#define MQTT_FRIENDLYNAME "mcmddevices"
 
 #define OTA_UPDATE_WEBPATH "/firmware"
-#define OTA_UPDATE_USERNAME "admin"
-#define OTA_UPDATE_PASSWORD "admin"
+
 #define HTTPRESPONSETIMEOUT 450
 
 const char *_deviceClientName = "espTestDevice";
@@ -682,7 +678,7 @@ void setupMQTT(String mqttServerIP, uint16_t mqttServerPort)
 void setupMQTT()
 {
 
-	setupMQTT(_deviceClientName, MQTT_SERVER_IP, MQTT_SERVER_PORT);
+	setupMQTT(_deviceClientName, MQTT_SERVERADDRESS, MQTT_SERVER_PORT);
 }
 
 void mqttSendInitStat()

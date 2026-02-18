@@ -25,7 +25,7 @@ using namespace tinyxml2;
 String _stationCode = STATIONCODE;
 #define HOST "lite.realtime.nationalrail.co.uk" //"52.48.160.4"
 #define HTTPPORT 443
-#define ACCESSTOKEN "ab8ff9fb-f3bd-492a-91d7-5d47f1c94ba1"
+
 #define URL "/OpenLDBWS/ldb9.asmx"
 //https://lite.realtime.nationalrail.co.uk/OpenLDBWS/ldb9.asmx
 
@@ -190,7 +190,7 @@ String getTrainDataFromURL()
 	__wifiClient.println(F("<soap:Header>"));
 	__wifiClient.println(F("<typ:AccessToken>"));
 	__wifiClient.print(F("<typ:TokenValue>"));
-	__wifiClient.print(ACCESSTOKEN);
+	__wifiClient.print(NR_ACCESSTOKEN);
 	__wifiClient.println(F("</typ:TokenValue>"));
 	__wifiClient.println(F("</typ:AccessToken>"));
 	__wifiClient.println(F("</soap:Header>"));
