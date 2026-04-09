@@ -85,6 +85,10 @@ uint8_t read_touchpad_cmd[11] = {0xb5, 0xab, 0xa5, 0x5a, 0x0, 0x0, 0x0, 0x8};
 int _brightnesses[5] = {0, 51, 115, 192, 255};
 int _selectedBrightness = 4;
 
+#define BACKLIGHT_PWM_CHANNEL 7
+#define BACKLIGHT_PWM_FREQUENCY 2000
+#define BACKLIGHT_PWM_RESOLUTION 8
+
 #define DISPLAY_WIDTH 640
 #define DISPLAY_HEIGHT 180
 
@@ -210,24 +214,18 @@ void setBrightness(byte brightnessValue)
 {
   DEBUG_PRINTLN("setBrightness: " + String(brightnessValue));
 
-  // ledcWrite(0, brightnessValue);
-  if (brightnessValue>0) 
-    brightnessValue=255;
-  if (brightnessValue<0) 
-    brightnessValue=0;
+  _brightness = brightnessValue;
+  ledcWrite(BACKLIGHT_PWM_CHANNEL, brightnessValue);
+  hw_set_brightness(brightnessValue);
 
-  //hw_set_brightness(brightnessValue);
-  //analogWrite(LCD_BACKLIGHT, brightnessValue);  
-  digitalWrite(TFT_BL, brightnessValue==255?1:0); // turn on backlight if brightness is > 0
-
-  // for (int i = 0; i < 5; i++)
-  // {
-  //   if (brightnessValue == _brightnesses[i])
-  //   {
-  //     _selectedBrightness = i;
-  //     break;
-  //   }
-  // }
+  for (int i = 0; i < 5; i++)
+  {
+    if (brightnessValue == _brightnesses[i])
+    {
+      _selectedBrightness = i;
+      break;
+    }
+  }
 }
 
 void toggleBrightness(bool isBright)
@@ -327,7 +325,7 @@ bool parseConfigValue(String key, String value)
   if (key == "brightness")
   {
     value.trim();
-    if (_configStation != value)
+    if (_brightness != value.toInt())
     {
       _brightness = value.toInt();
       setBrightness(_brightness);
@@ -1121,6 +1119,9 @@ void initDisplay()
   DEBUG_PRINTLN("Initialising Display");
   pinMode(TFT_BL, OUTPUT);
   digitalWrite(TFT_BL, LOW); // turn off backlight asap to minimise power on artifacts
+  ledcSetup(BACKLIGHT_PWM_CHANNEL, BACKLIGHT_PWM_FREQUENCY, BACKLIGHT_PWM_RESOLUTION);
+  ledcAttachPin(TFT_BL, BACKLIGHT_PWM_CHANNEL);
+  ledcWrite(BACKLIGHT_PWM_CHANNEL, 0);
 
   DEBUG_PRINTLN("axs15231_init()");
   axs15231_init(); //_display.init();
@@ -1145,8 +1146,8 @@ void initDisplay()
   clear_Display();
   // lcd_fill(0,0,180,640,0x00);       // clear screen
 
-  DEBUG_PRINTLN("Backlight on");
-  digitalWrite(TFT_BL, HIGH); // turn on backlight
+  DEBUG_PRINTLN("Set initial backlight brightness");
+  setBrightness(_brightness);
 
   DEBUG_PRINTLN("Init Display Complete");
 }
@@ -1613,8 +1614,8 @@ void setup()
   checkBST();
 
   DisplayOut("Attempting MQTT: ");
-  DisplayOut(String(MQTT_SERVERADDRESS) + ":1883");
-  _mqttClient.setServer(MQTT_SERVERADDRESS, 1883);
+  DisplayOut(String(MQTT_SERVERADDRESS) + ":" + String(MQTT_SERVER_PORT));
+  _mqttClient.setServer(MQTT_SERVERADDRESS, MQTT_SERVER_PORT);
   _mqttClient.setCallback(mqttCallback);
 
   DisplayOut("Free Heap Memory: " + String(ESP.getFreeHeap()));

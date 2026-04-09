@@ -42,9 +42,7 @@ byte _networkConnection = 1;
 
 
 #define OTA_UPDATE_WEBPATH "/firmware"
-
 #define HTTPRESPONSETIMEOUT 450
-
 const char *_deviceClientName = "espTestDevice";
 
 #ifdef SECURE

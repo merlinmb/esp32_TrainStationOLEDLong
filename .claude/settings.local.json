@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pio run:*)",
+      "Bash(cat .pio/build/*/compile_commands.json)"
+    ]
+  }
+}
