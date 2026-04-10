@@ -1446,7 +1446,7 @@ void checkTouch()
   Wire.beginTransmission(ALS_ADDRESS);
   Wire.write(read_touchpad_cmd, 8);
   Wire.endTransmission();
-  Wire.requestFrom(ALS_ADDRESS, AXS_TOUCH_TWO_POINT_LEN);
+  Wire.requestFrom(ALS_ADDRESS, (uint8_t)AXS_TOUCH_TWO_POINT_LEN);
   while (!Wire.available())
   {
   }

@@ -66,7 +66,7 @@ byte _ledBuiltIn = 12;
 WiFiUDP ntpUDP;
 // const byte offset = 2;
 #define OFFSET 1
-char* _timeServer = "pool.ntp.org";
+const char* _timeServer = "pool.ntp.org";
 NTPClient _timeClient(ntpUDP, _timeServer, OFFSET, 60000);
 unsigned long _unixTime;
 String _ntpDate = "";
