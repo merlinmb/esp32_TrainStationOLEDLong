@@ -184,8 +184,10 @@ String _ip = "";
 #define NTPTIMEOUTVAL 4500
 const char *ntpServer = "pool.ntp.org";
 
-const long timezoneOffset = 0; // 0-23
-const long gmtOffset_sec = timezoneOffset * 60 * 60;
+// POSIX TZ string for UK time: GMT in winter, BST (+1h) in summer
+// BST starts last Sunday in March at 1:00 UTC, ends last Sunday in October at 1:00 UTC
+const char *timezoneStr = "GMT0BST,M3.5.0/1,M10.5.0";
+const long gmtOffset_sec = 0;
 const int daylightOffset_sec = 0;
 unsigned long _epochTime;
 
@@ -1317,8 +1319,6 @@ void updateLocalTime()
     return;
   }
 
-  adjustBST(&timeinfo);
-
   strftime(timeHour, 3, "%H", &timeinfo);
   strftime(timeMin, 3, "%M", &timeinfo);
   strftime(timeSec, 3, "%S", &timeinfo);
@@ -1644,6 +1644,8 @@ void setup()
   DisplayOut("Updating local time");
   setupTimeClient();
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  setenv("TZ", timezoneStr, 1);
+  tzset();
   updateLocalTime();
 
   printRAM();
