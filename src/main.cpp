@@ -115,7 +115,7 @@ int _selectedBrightness = 4;
 #define CALLINGATSPRITEMOVEBY 8
 
 bool _brightnessHigh;
-byte _brightness = 100;
+byte _brightness = 255;
 
 int px = 10;
 int py = 10;
@@ -318,6 +318,7 @@ bool parseConfigValue(String key, String value)
     {
       _configFlipSreen = __intValue;
       _display.setRotation(_configFlipSreen);
+      lcd_setRotation(_configFlipSreen == 3 ? 0 : 2);
       //_forceRender = true;
     }
   }
@@ -1046,7 +1047,9 @@ bool updateTrainStationData()
 /***************************************************
   MQTT
 ****************************************************/
-void mqttTransmitCustomSubscribe() {}
+void mqttTransmitCustomSubscribe() {
+  mqttSubscribe("cmnd/mcmddevices/#");
+}
 void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
   DEBUG_PRINT("Message arrived [");
@@ -1669,7 +1672,15 @@ void loop()
 
     if (_runCurrent - _runWiFiConnectionCheck >= UPDATE_WIFICHECK_INTERVAL_MILLISECS)
     {
-      isWiFiConnected(); // make sure we're still connected
+      if (isWiFiConnected()) // make sure we're still connected
+      {
+        if(_mqttClient.connected()) {
+          // we're connected to wifi and mqtt, all good
+        } else {
+          DisplayOut("MQTT connection lost, attempting reconnect");
+          mqttReconnect(_mqttClientId);
+        } 
+      }
       _runWiFiConnectionCheck = millis();
     }
 

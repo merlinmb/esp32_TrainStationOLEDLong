@@ -182,6 +182,7 @@ String getTrainDataFromURL(String HOST, int PORT, String URL)
 		resultString += __wifiClientSecure.readStringUntil('\n');
 		// char c = __wifiClientSecure.read();
 		// resultString += String(c);// readStringUntil('\r');
+		_mqttClient.loop();
 	}
 
 	DEBUG_PRINTLN("\r\nClosing connection");
