@@ -31,7 +31,7 @@
 /*
  * Touch Specific Calls & definition
  */
-uint8_t ALS_ADDRESS = 0x3B;
+const uint8_t ALS_ADDRESS = 0x3B;
 #define TOUCH_IICSCL 10
 #define TOUCH_IICSDA 15
 #define TOUCH_INT 11
@@ -1282,6 +1282,11 @@ void setupWebServer()
 				String __key = _httpServer.argName(i);
 				__update = parseConfigValue(__key, __val);
 				__retMessage += " " + _httpServer.argName(i) + ": " + _httpServer.arg(i) + (__update ? " set." : " not set.") + "\n";
+        if (__key=="brightness") {
+          _brightness =map(__val.toInt(), 0, 100, 0, 255);
+          setBrightness(_brightness);
+        }
+
 			}
 			_httpServer.send(200, "text/plain", __retMessage);
 
@@ -1443,20 +1448,22 @@ void checkTouch()
   Wire.readBytes(__touchBuffer, AXS_TOUCH_TWO_POINT_LEN);
 
   uint8_t __numTouchPoints = AXS_GET_POINT_NUM(__touchBuffer);
-  uint16_t __gestureType = AXS_GET_GESTURE_TYPE(__touchBuffer);
+  uint8_t __gestureType = AXS_GET_GESTURE_TYPE(__touchBuffer);
 
   if (__numTouchPoints && !__gestureType)
   {
-    // Serial.printf("type:%d \n", num);
     DEBUG_PRINTLN("Touch Detected");
-    // Serial.printf("num:%d \n", num);
-    int __pointX = 0, __pointY = 0;
-    for (int i = 0; i < __numTouchPoints; ++i)
-    {
-      __pointX = AXS_GET_POINT_X(__touchBuffer, i);
-      __pointY = AXS_GET_POINT_Y(__touchBuffer, i);
-      DEBUG_PRINTLN(String(__numTouchPoints) + " touch @ (" + String(__pointX) + "," + String(__pointY) + ")");
-    }
+
+    // Raw touch coords are in native portrait space (X: 0-180, Y: 0-640).
+    // lcd_setRotation(2) rotates 90° to landscape (640x180), so remap:
+    //   display X = raw Y  (0-640)
+    //   display Y = 180 - raw X  (mirrored)
+    // Use point 0 for single-touch zone decisions.
+    int __rawX = AXS_GET_POINT_X(__touchBuffer, 0);
+    int __rawY = AXS_GET_POINT_Y(__touchBuffer, 0);
+    int __screenX = __rawY;
+    int __screenY = DISPLAY_HEIGHT - __rawX;
+    DEBUG_PRINTLN(String(__numTouchPoints) + " touch @ screen (" + String(__screenX) + "," + String(__screenY) + ")");
 
     if (__numTouchPoints == 2)
     {
@@ -1471,15 +1478,15 @@ void checkTouch()
       }
       else
       {
-        if (__pointX > 0 && __pointX < TOUCHCOLUMNWIDTH)
+        if (__screenX > 0 && __screenX < TOUCHCOLUMNWIDTH)
         {
           advanceFrame();
         }
-        else if (__pointX > TOUCHCOLUMNWIDTH && __pointX < TOUCHCOLUMNWIDTH * 2)
+        else if (__screenX >= TOUCHCOLUMNWIDTH && __screenX < TOUCHCOLUMNWIDTH * 2)
         {
           rotateBrightness();
         }
-        else if (__pointX > TOUCHCOLUMNWIDTH * 2 && __pointX < DISPLAY_WIDTH)
+        else if (__screenX >= TOUCHCOLUMNWIDTH * 2 && __screenX < DISPLAY_WIDTH)
         {
           reverseFrame();
         }
