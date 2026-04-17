@@ -518,8 +518,6 @@ int zellersCongruence(int year, int month, int day) {
 
 #define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ))     // from time-lib
 
-#define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ))     // from time-lib
-
 int calcDayOfWeek(uint16_t year, uint8_t month, uint8_t day)
 {
   uint16_t months[] = 

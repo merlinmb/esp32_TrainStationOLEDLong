@@ -397,21 +397,17 @@ bool GetTrainConditionsAndForecast(String time, String date)
 
 String getETAFromTrainlineStruct(int __train)
 {
+  if (_mainStation.departures[__train].timeTableLength <= 0)
+    return "";
   return _mainStation.departures[__train].timeTable.trainStops[_mainStation.departures[__train].timeTableLength - 1].stop_aimed_arrival_time;
 }
 
 String getCallingAtFromTrainLineStruct(int __train)
 {
-  String __stopString = "";
-  if (_mainStation.departures[__train].timeTableLength > 0)
-  {
-    __stopString = "";
-  }
-  else
-  {
+  if (_mainStation.departures[__train].timeTableLength <= 0)
     return "";
-  }
 
+  String __stopString = "";
   for (byte i = 0; i < _mainStation.departures[__train].timeTableLength; i++)
   {
     __stopString += _mainStation.departures[__train].timeTable.trainStops[i].stop_station_name;

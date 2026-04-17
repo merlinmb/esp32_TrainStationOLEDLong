@@ -21,6 +21,7 @@
 #include "fonts/Monospaced_plain_12.h"
 #include "fonts/Monospaced_plain_16.h"
 #include "fonts/Orbitron_Bold_16.h"
+// Orbitron_Light_32 is already included via TFT_eSPI/User_Custom_Fonts.h
 
 #include "ArduinoJson.h"
 
@@ -56,7 +57,7 @@ uint8_t ALS_ADDRESS = 0x3B;
 #define AXS_GET_POINT_X(buf, point_index) (((uint16_t)(buf[AXS_TOUCH_ONE_POINT_LEN * point_index + AXS_TOUCH_X_H_POS] & 0x0F) << 8) + (uint16_t)buf[AXS_TOUCH_ONE_POINT_LEN * point_index + AXS_TOUCH_X_L_POS])
 #define AXS_GET_POINT_Y(buf, point_index) (((uint16_t)(buf[AXS_TOUCH_ONE_POINT_LEN * point_index + AXS_TOUCH_Y_H_POS] & 0x0F) << 8) + (uint16_t)buf[AXS_TOUCH_ONE_POINT_LEN * point_index + AXS_TOUCH_Y_L_POS])
 #define AXS_GET_POINT_EVENT(buf, point_index) (buf[AXS_TOUCH_ONE_POINT_LEN * point_index + AXS_TOUCH_EVENT_POS] >> 6)
-uint8_t read_touchpad_cmd[11] = {0xb5, 0xab, 0xa5, 0x5a, 0x0, 0x0, 0x0, 0x8};
+uint8_t read_touchpad_cmd[8] = {0xb5, 0xab, 0xa5, 0x5a, 0x0, 0x0, 0x0, 0x8};
 
 /*
  * Fonts
@@ -120,7 +121,6 @@ byte _brightness = 255;
 int px = 10;
 int py = 10;
 
-String _mqttPostFix = "";
 float _batteryVoltage = 0;
 
 #define HTTPSPORT 443
@@ -282,16 +282,6 @@ void clear_Display()
 #define CENTERY int(DISPLAY_HEIGHT / 2)
 #define CLOCKRADIUS 80
 
-float sx = 0, sy = 1, mx = 1, my = 0, hx = -1, hy = 0; // Saved H, M, S x & y multipliers
-float sdeg = 0, mdeg = 0, hdeg = 0;
-uint16_t osx = CENTERX, osy = CENTERY, omx = CENTERX, omy = CENTERY, ohx = CENTERX, ohy = CENTERY; // Saved H, M, S x & y coords
-uint16_t x0 = 0, x1 = 0, yy0 = 0, yy1 = 0;
-uint32_t targetTime = 0; // for next 1 second timeout
-
-static uint8_t conv2d(const char *p);                                                // Forward declaration needed for IDE 1.6.x
-uint8_t hh = conv2d(__TIME__), mm = conv2d(__TIME__ + 3), ss = conv2d(__TIME__ + 6); // Get H, M, S from compile time
-
-bool initial = 1;
 
 /***************************************************
   SPIFFS functions
@@ -330,7 +320,7 @@ bool parseConfigValue(String key, String value)
     value.trim();
     if (_brightness != value.toInt())
     {
-      _brightness = value.toInt();
+      _brightness = constrain(value.toInt(), 0, 255);
       setBrightness(_brightness);
       //_forceRender = true;
     }
@@ -406,14 +396,6 @@ void saveConfigValuesSPIFFS()
   delay(250); // give SPIFFS chance to settle
 }
 
-static uint8_t conv2d(const char *p)
-{
-  uint8_t v = 0;
-  if ('0' <= *p && *p <= '9')
-    v = *p - '0';
-  return 10 * v + *++p - '0';
-}
-
 void drawProgress(byte percentage, String label)
 {
   // clearSprite();
@@ -451,7 +433,7 @@ void DisplayOut(String outStr)
     _sprite.drawString(_debugBuffer[i], 5, 20 * i, 2);
   }
   _sprite.unloadFont();
-  lcd_PushColors_rotated_90(0, 0, 640, 180, (uint16_t *)_sprite.getPointer());
+  lcd_PushColors_rotated_90(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, (uint16_t *)_sprite.getPointer());
   // delay(100);
 }
 
@@ -619,12 +601,14 @@ boolean isDigit(char c)
 // check a string to see if it is numeric
 bool isNumeric(String str)
 {
+  if (str.length() == 0)
+    return false;
   for (byte i = 0; i < str.length(); i++)
   {
-    if (isDigit(str.charAt(i)))
-      return true;
+    if (!isDigit(str.charAt(i)))
+      return false;
   }
-  return false;
+  return true;
 }
 
 String getLiveTrainStatusFromInput(String input)
@@ -664,7 +648,7 @@ u_int16_t getLiveTrainStatusColorFromInput(int __train)
 /***************************************************
   Display & Rendering
 ****************************************************/
-void fillandDrawRect(int x1, int y1, int x2, int y2, int radius, uint8_t bgColor, uint8_t lineColor)
+void fillandDrawRect(int x1, int y1, int x2, int y2, int radius, uint16_t bgColor, uint16_t lineColor)
 {
   _sprite.fillRect(x1, y1, x2, y2, bgColor);
   _sprite.fillRoundRect(x1 - TIMEBOXMARGIN - 3, y1 - TIMEBOXMARGIN - 3, x2 - x1 + TIMEBOXMARGIN * 2 + 6, y2 - y1 + TIMEBOXMARGIN * 2 + 6, radius, lineColor);
@@ -806,7 +790,7 @@ void RenderPlatform(int _line)
 
   DEBUG_PRINTLN("RenderPlatform: Train " + String(_line));
 
-  if (_line < 0 || _line > _numTrains)
+  if (_line < 0 || _line >= _numTrains || _line >= (int)_renderNumTrainsMax)
     return;
 
   DEBUG_PRINTLN("RenderPlatform: render headings");
@@ -890,7 +874,8 @@ void RenderPlatform(int _line)
   }
 
   // arrival
-  if (_mainStation.departures[_line].timeTable.trainStops[_mainStation.departures[_line].timeTableLength - 1].stop_aimed_arrival_time.length() > 0)
+  if (_mainStation.departures[_line].timeTableLength > 0 &&
+      _mainStation.departures[_line].timeTable.trainStops[_mainStation.departures[_line].timeTableLength - 1].stop_aimed_arrival_time.length() > 0)
   {
     _platformSprites[_line].setFreeFont(&PLATFORMFONTMEDIUM);
     _platformSprites[_line].drawString(fixTimeFormatting(_mainStation.departures[_line].timeTable.trainStops[_mainStation.departures[_line].timeTableLength - 1].stop_aimed_arrival_time), P_COL3, P_ROW6 - P_ROWFONTOFFSET);
@@ -907,7 +892,7 @@ void RenderPlatform(int _line)
   }
   else if (_callingAtString.length() > 0)
   {
-    DEBUG_PRINTLN("Calling at: " + _callingAtString.length());
+    DEBUG_PRINTLN("Calling at: " + _callingAtString);
 
     _callingAtString = _callingAtString + ".";
     _callingAtSprites[_line].setFreeFont(&PLATFORMMINIHEADINGFONT);
@@ -921,6 +906,7 @@ void RenderPlatform(int _line)
     _callingAtSprites[_line].createSprite(_callingAtStringWidth[_line], 14);
 
     DEBUG_PRINTLN("Calling at render width: " + String(_callingAtStringWidth[_line]));
+    _callingAtSprites[_line].setFreeFont(&PLATFORMMINIHEADINGFONT);
     _callingAtSprites[_line].setTextColor(TFT_WHITE, TFT_BLACK);
     _callingAtSprites[_line].drawString(_callingAtString.c_str(), 0, 0);
 
@@ -1057,9 +1043,10 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
   DEBUG_PRINT("Message arrived [");
   DEBUG_PRINT(topic);
   DEBUG_PRINT("] ");
+  unsigned int __safeLen = min(length, (unsigned int)99);
   char message_buff[100];
-  int i = 0;
-  for (i = 0; i < length; i++)
+  unsigned int i = 0;
+  for (i = 0; i < __safeLen; i++)
   {
     message_buff[i] = payload[i];
   }
@@ -1083,15 +1070,14 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
   }
   if (__incomingTopic == "cmnd/"+ String(MQTT_FRIENDLYNAME) +"/brightness")
   {
-    _brightness = __payloadString.toInt();
+    _brightness = constrain(__payloadString.toInt(), 0, 255);
     DEBUG_PRINTLN("Setting Brightness to: " + String(_brightness));
     setBrightness(_brightness);
   }
 
   if (__incomingTopic == "cmnd/mcmddevices/brightnesspercentage")
   {
-    _brightness = __payloadString.toInt();
-    _brightness = map(_brightness, 0, 100, 0, 255);
+    _brightness = constrain((int)map(__payloadString.toInt(), 0, 100, 0, 255), 0, 255);
     DEBUG_PRINTLN("Setting Brightness to: " + String(_brightness));
     setBrightness(_brightness);
   }
@@ -1384,7 +1370,7 @@ void reverseFrame()
 
 String createJSONObjectFromTrainData()
 {
-  StaticJsonDocument<4096> doc; // Increased capacity to accommodate all fields
+  DynamicJsonDocument doc(4096); // heap allocation to avoid stack pressure
   JsonArray departures = doc.to<JsonArray>();
 
   for (int i = 0; i < _numTrains; i++) {
@@ -1447,8 +1433,11 @@ void checkTouch()
   Wire.write(read_touchpad_cmd, 8);
   Wire.endTransmission();
   Wire.requestFrom(ALS_ADDRESS, (uint8_t)AXS_TOUCH_TWO_POINT_LEN);
+  unsigned long __wireTimeout = millis();
   while (!Wire.available())
   {
+    if (millis() - __wireTimeout > 50)
+      return;
   }
 
   Wire.readBytes(__touchBuffer, AXS_TOUCH_TWO_POINT_LEN);
@@ -1461,7 +1450,7 @@ void checkTouch()
     // Serial.printf("type:%d \n", num);
     DEBUG_PRINTLN("Touch Detected");
     // Serial.printf("num:%d \n", num);
-    int __pointX, __pointY = 0;
+    int __pointX = 0, __pointY = 0;
     for (int i = 0; i < __numTouchPoints; ++i)
     {
       __pointX = AXS_GET_POINT_X(__touchBuffer, i);
@@ -1582,7 +1571,6 @@ void setup()
   Serial.begin(115200);
 
   DEBUG_PRINTLN("Starting...");
-  _mqttPostFix = String(random(0xffff), HEX);
   _mqttClientId = MQTT_CLIENTNAME;
   _deviceClientName = MQTT_CLIENTNAME;
 
@@ -1598,10 +1586,7 @@ void setup()
   DisplayOut("Web Server config");
   setupWebServer();
 
-  // Start the server
-  // DEBUG_PRINT(F("********** Free Heap: "));   DEBUG_PRINTLN(ESP.getFreeHeap());
-  DisplayOut("Web Server starting");
-  _httpServer.begin();
+  // Web server already started inside setupWebServer()
 
   // DEBUG_PRINT(F("********** Free Heap: "));   DEBUG_PRINTLN(ESP.getFreeHeap());
   DisplayOut("OTA Firmware Setup");
@@ -1612,9 +1597,6 @@ void setup()
   mqttReconnect(_mqttClientId);
   mqttCustomSubscribe();
   mqttSendInitStat();
-
-  DisplayOut("Setup Time Server");
-  checkBST();
 
   DisplayOut("Attempting MQTT: ");
   DisplayOut(String(MQTT_SERVERADDRESS) + ":" + String(MQTT_SERVER_PORT));
@@ -1641,11 +1623,13 @@ void setup()
   setupSPIFFS();
   loadCustomParamsSPIFFS();
 
-  DisplayOut("Updating local time");
-  setupTimeClient();
+  DisplayOut("Configuring time (NTP + TZ)");
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   setenv("TZ", timezoneStr, 1);
   tzset();
+  // checkBST and setupTimeClient now run after configTime so getLocalTime() is valid
+  checkBST();
+  setupTimeClient();
   updateLocalTime();
 
   printRAM();
@@ -1669,6 +1653,7 @@ void loop()
 
     if (_runCurrent - _runTrains >= UPDATE_TRAINS_INTERVAL_MILLISECS || _forceUpdate)
     {
+      _forceUpdate = false;
       updateTrainDataRenderSprites();
     }
 
@@ -1772,7 +1757,7 @@ void loop()
       _forceDrawClock = false;
     }
 
-    lcd_PushColors_rotated_90(0, 0, 640, 180, (uint16_t *)_sprite.getPointer());
+    lcd_PushColors_rotated_90(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, (uint16_t *)_sprite.getPointer());
   }
 
     _mqttClient.loop();
