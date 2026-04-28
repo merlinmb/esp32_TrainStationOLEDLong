@@ -63,7 +63,7 @@ String loginIndex2 =
 "suggestionCards: 'off'"
 "};"
 "function check(form) {"
-"if(form.userid.value=='admin' && form.pwd.value=='1llusion_mb')"
+"if(form.userid.value=='" + String(OTA_UPDATE_USERNAME) + "' && form.pwd.value=='" + String(OTA_UPDATE_PASSWORD) + "')"
 "{window.open('/serverIndex')}"
 "else"
 "{alert('Error Password or Username')}"

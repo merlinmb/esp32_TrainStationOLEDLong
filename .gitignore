@@ -8,3 +8,14 @@
 src/main.cpp.hw
 src/main.cpp.working
 include/connectionDetails.h
+
+# Local runtime configuration and secrets
+data/config.ini
+
+# Optional local certs/keys (public certs in certs/ may still be tracked intentionally)
+certs/*.key
+certs/*.pem
+certs/*.p12
+certs/*.pfx
+.claude
+.vscode

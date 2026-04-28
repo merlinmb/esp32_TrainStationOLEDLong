@@ -371,8 +371,29 @@ void mqttHandleFriendlyCallback(String mqttIncomingTopic, String mqttIncomingPay
 
 bool mqttReconnect(String deviceName)
 {
-	_mqttClientId = deviceName;
-	_mqttClientId += "_" + String(random(0xffff), HEX);
+	String __baseClientName = deviceName;
+	String __configuredBaseName = String(_deviceClientName);
+
+	// If a previously generated client id is accidentally passed back in,
+	// normalize to the configured base name so the suffix does not keep growing.
+	if (__baseClientName.startsWith(__configuredBaseName + "_"))
+	{
+		__baseClientName = __configuredBaseName;
+	}
+
+	String __macSuffix = WiFi.macAddress();
+	__macSuffix.replace(":", "");
+	__macSuffix.toLowerCase();
+	if (__macSuffix.length() >= 6)
+	{
+		__macSuffix = __macSuffix.substring(__macSuffix.length() - 6);
+	}
+	if (__macSuffix.length() == 0)
+	{
+		__macSuffix = "000000";
+	}
+
+	_mqttClientId = __baseClientName + "_" + __macSuffix;
 	DEBUG_PRINTLN("MQTT reconnecting with client id [" + _mqttClientId + "]");
 	int __retryCount = 0;
 	_mqttClient.setSocketTimeout(500);

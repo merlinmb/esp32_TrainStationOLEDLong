@@ -1601,7 +1601,7 @@ void setup()
 
   DisplayOut("Configuring MQTT");
   setupMQTT();
-  mqttReconnect(_mqttClientId);
+  mqttReconnect();
   mqttCustomSubscribe();
   mqttSendInitStat();
 
@@ -1672,7 +1672,7 @@ void loop()
           // we're connected to wifi and mqtt, all good
         } else {
           DisplayOut("MQTT connection lost, attempting reconnect");
-          mqttReconnect(_mqttClientId);
+          mqttReconnect();
         } 
       }
       _runWiFiConnectionCheck = millis();
